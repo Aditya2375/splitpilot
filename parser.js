@@ -1,6 +1,6 @@
 'use strict';
 // Turns a plain-language expense into a structured plan.
-// Uses an LLM (any OpenAI-compatible endpoint, e.g. Groq or Gemini) when LLM_API_KEY is set.
+// Uses an LLM (any OpenAI-compatible endpoint, Gemini by default) when LLM_API_KEY is set.
 // Otherwise falls back to a rule-based parser so the app always works.
 
 const SYSTEM = `You turn a message about a shared expense into JSON only. Schema:
@@ -62,12 +62,11 @@ async function llmParse(text, me, cfg) {
 
 async function parseExpense(text, me, env = process.env) {
   if (env.LLM_API_KEY) {
-    const cfg = {
-      key: env.LLM_API_KEY,
-      url: env.LLM_URL || 'https://api.groq.com/openai/v1/chat/completions',
-      model: env.LLM_MODEL || 'llama-3.3-70b-versatile',
-    };
-    try { return await llmParse(text, me, cfg); } catch (e) { /* fall through to rules */ }
+    const url = env.LLM_URL || 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions';
+    const models = (env.LLM_MODEL || 'gemini-flash-lite-latest,gemini-3-flash-preview').split(',').map(s => s.trim());
+    for (const model of models) {
+      try { return await llmParse(text, me, { key: env.LLM_API_KEY, url, model }); } catch (e) { /* try next model, then rules */ }
+    }
   }
   return ruleParse(text, me);
 }
