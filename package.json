@@ -1,0 +1,9 @@
+{
+  "name": "splitpilot",
+  "version": "1.0.0",
+  "description": "An AI agent that splits shared expenses and collects each share through PayPal.",
+  "main": "server.js",
+  "scripts": { "start": "node server.js", "test": "node --test test/" },
+  "engines": { "node": ">=18" },
+  "license": "MIT"
+}
