@@ -14,11 +14,13 @@ function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
 function ruleParse(text, me) {
   const t = text.replace(/\s+/g, ' ').trim();
-  const m = t.match(/(\$|€|£|₹|rs\.?\s?|usd|eur|gbp|cad|aud|inr)?\s?(\d+(?:[.,]\d+)?)\s?(usd|eur|euros?|gbp|cad|aud|inr|dollars?)?/i);
+  const sym = t.match(/(\$|€|£|₹|rs\.?\s?)\s?(\d+(?:[.,]\d+)?)/i) || t.match(/(\d+(?:[.,]\d+)?)\s?(usd|eur|euros?|gbp|cad|aud|inr|dollars?)\b/i);
+  const m = sym || t.match(/(\d+(?:[.,]\d+)?)/);
   let total = 0, currency = 'USD';
   if (m) {
-    total = Number(m[2].replace(',', '.'));
-    const c = (m[1] || m[3] || '').toLowerCase().replace(/\s|\./g, '');
+    const isPre = sym && /^[^\d]/.test(sym[1]);
+    total = Number((isPre ? m[2] : m[1]).replace(',', '.'));
+    const c = (isPre ? m[1] : (m[2] || '')).toLowerCase().replace(/\s|\./g, '');
     if (CURRENCY[c]) currency = CURRENCY[c];
   }
   const payerMatch = t.match(/^(i|[A-Za-z]+)\s+(?:paid|bought|ordered|covered|booked)/i);
@@ -32,7 +34,9 @@ function ruleParse(text, me) {
     }
   }
   const people = [];
+  const meIn = withMatch && /\b(me|myself)\b/i.test(withMatch[1]);
   if (payer) people.push({ name: payer, weight: 1 });
+  if (meIn && me && !names.some(n => n.toLowerCase() === me.toLowerCase()) && payer !== me) names.push(me);
   for (const n of names) if (!people.find(p => p.name.toLowerCase() === n.toLowerCase())) people.push({ name: n, weight: 1 });
   const what = t.match(/(?:for|on)\s+(?:the\s+)?([a-z ]{3,30}?)(?:\s+(?:with|between|among|split)|[.,]|$)/i);
   return { description: what ? cap(what[1].trim()) : 'Shared expense', currency, total, payer, people, notes: 'rule-based parse' };
