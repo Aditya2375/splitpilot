@@ -30,6 +30,7 @@ function buildSplit(plan) {
   const order = plan.people.map(p => p.name);
   out.sort((a, b) => order.indexOf(a.name) - order.indexOf(b.name));
   const payer = plan.payer || null;
+  if (payer && !out.some(o => o.name === payer)) { /* payer paid but does not share: everyone listed owes them */ }
   return {
     description: plan.description || 'Shared expense',
     currency: plan.currency || 'USD',

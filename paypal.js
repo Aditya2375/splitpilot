@@ -39,7 +39,8 @@ async function createOrder({ amount, currency, description, requestId, returnUrl
 }
 
 async function captureOrder(id, env = process.env) {
-  if (!configured(env) || String(id).startsWith('MOCK-')) return { id, status: 'COMPLETED', mock: true };
+  if (String(id).startsWith('MOCK-')) return { id, status: 'COMPLETED', mock: true };
+  if (!configured(env)) throw new Error('unknown order');
   const t = await token(env);
   const r = await fetch(BASE + '/v2/checkout/orders/' + encodeURIComponent(id) + '/capture', {
     method: 'POST', headers: { authorization: 'Bearer ' + t, 'content-type': 'application/json' }, body: '{}',

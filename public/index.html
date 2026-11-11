@@ -38,12 +38,14 @@
     <button id="send" class="primary">Create PayPal requests</button>
   </section>
 
+  <section id="demo" class="banner hidden">Demo mode: no PayPal credentials are configured, so orders are labelled demo orders and "Simulate payment" stands in for the PayPal approval screen. Nothing is sent to PayPal.</section>
+
   <section id="ledger" class="card hidden">
-    <div class="k">Requests</div>
+    <div class="plan-head"><div><div class="k">Requests</div><div id="sum" class="note"></div></div><button id="clear" class="btn">Clear all</button></div>
     <div id="items"></div>
   </section>
 </main>
-<footer>Runs on the PayPal Sandbox. No real money moves. <a href="https://github.com/Aditya2375/splitpilot">Source</a></footer>
+<footer>Built for the PayPal Sandbox. No real money moves. <a href="https://github.com/Aditya2375/splitpilot">Source</a></footer>
 <script src="app.js"></script>
 </body>
 </html>
