@@ -42,6 +42,7 @@ function sanitizePlan(raw) {
     }
     people.push(out);
   }
+  if (people.length < 2) throw new Error('need at least two different people to split between');
   let payer = cleanName(raw.payer);
   if (!payer) throw new Error('say who paid');
   const match = people.find(p => p.name.toLowerCase() === payer.toLowerCase());

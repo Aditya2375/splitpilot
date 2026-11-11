@@ -4,7 +4,12 @@ Say what happened, like you would in a group chat. SplitPilot works out who owes
 
 > "I paid $84 for pizza with Rahul, Meera and Dev"  ->  three PayPal checkouts of $21.00, each with its own pay link.
 
-Built for the PayPal AI Hackathon (agentic commerce: an AI agent that turns a sentence into real payment requests).
+Live demo: https://splitpilot-x0p8.onrender.com (free host, first load can take up to a minute while it wakes).
+
+## Two modes, stated honestly
+
+- **Sandbox mode**: when `PAYPAL_CLIENT_ID` and `PAYPAL_CLIENT_SECRET` (PayPal Sandbox app) are set, each share becomes a real PayPal Sandbox order with an approval link, and paying captures it.
+- **Demo mode** (the hosted demo): no PayPal keys. Orders are labelled `MOCK-...` and "Simulate payment" stands in for the PayPal approval screen. The PayPal client in `paypal.js` has not been exercised against the live Sandbox API in this repo's hosted demo, so treat Sandbox mode as untested until you run it with your own keys.
 
 ## How it works
 
@@ -39,6 +44,14 @@ No Node dependencies to install (Node 18+). With no PayPal keys it runs in a cle
 - PayPal Sandbox REST API (OAuth2, Orders v2 create + capture)
 - Google Gemini (free tier, OpenAI-compatible endpoint) for language understanding
 - Node.js standard library only
+
+## Security notes
+
+- LLM output and browser input are untrusted: `validate.js` strips names, caps people (20) and total (10,000), whitelists currencies, and rejects bad plans. The server recomputes every split itself.
+- The message is passed to the model as data with an instruction to ignore embedded commands; even if that fails, validation and deterministic math bound what it can do.
+- Strict CSP, no inline scripts, per-IP rate limits, request size cap, order IDs checked by pattern, redirect URLs built from `PUBLIC_URL` or a validated Host header.
+- No database and no accounts: the ledger lives in your browser's localStorage. No secrets are stored in the repo.
+- Not production payments software: no login, so anyone with the link can create sandbox orders (rate limited).
 
 ## License
 

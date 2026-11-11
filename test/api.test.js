@@ -14,8 +14,9 @@ async function call(s, path, body, method = 'POST') {
 test('sanitizePlan rejects hostile or broken LLM output', () => {
   assert.throws(() => sanitizePlan({ total: -5, payer: 'A', people: [{ name: 'A' }] }));
   assert.throws(() => sanitizePlan({ total: 10, payer: 'A', people: [] }));
-  assert.throws(() => sanitizePlan({ total: 1e9, payer: 'A', people: [{ name: 'A' }] }));
-  assert.throws(() => sanitizePlan({ total: 10, payer: '', people: [{ name: 'A' }] }));
+  assert.throws(() => sanitizePlan({ total: 1e9, payer: 'A', people: [{ name: 'A' }, { name: 'B' }] }));
+  assert.throws(() => sanitizePlan({ total: 10, payer: '', people: [{ name: 'A' }, { name: 'B' }] }));
+  assert.throws(() => sanitizePlan({ total: 10, payer: 'A', people: [{ name: 'A' }, { name: 'a' }] }));
   const p = sanitizePlan({ total: '10', currency: 'XXX', payer: 'ab', description: '<script>x</script>', people: [{ name: 'A<b>' }, { name: 'ab' }, { name: 'Bob', weight: -3 }] });
   assert.strictEqual(p.currency, 'USD');
   assert.strictEqual(p.people.length, 2);
